@@ -1,6 +1,7 @@
 package dev.jsinco.brewery.util;
 
 import com.google.common.base.Preconditions;
+import lombok.Getter;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 public class Wrapper<T, U> {
 
+    @Getter
     private final T identifier;
     private final WrapperType<T, U> type;
 

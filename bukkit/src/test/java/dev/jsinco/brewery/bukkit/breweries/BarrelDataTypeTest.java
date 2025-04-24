@@ -81,12 +81,12 @@ class BarrelDataTypeTest {
         ));
         database.insertValue(BukkitBarrelDataType.INSTANCE, barrel);
         database.flush().join();
-        List<BukkitBarrel> retrievedBarrels = database.findNow(BukkitBarrelDataType.INSTANCE, world.getUID());
+        List<BukkitBarrel> retrievedBarrels = database.findNow(BukkitBarrelDataType.INSTANCE, world);
         assertEquals(1, retrievedBarrels.size());
         BukkitBarrel retrievedBarrel = retrievedBarrels.get(0);
         assertEquals(2, retrievedBarrel.getBrews().size());
         database.remove(BukkitBarrelDataType.INSTANCE, barrel);
-        assertTrue(database.findNow(BukkitBarrelDataType.INSTANCE, world.getUID()).isEmpty());
+        assertTrue(database.findNow(BukkitBarrelDataType.INSTANCE, world).isEmpty());
     }
 
 }

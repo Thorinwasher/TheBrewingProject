@@ -4,7 +4,9 @@ import dev.jsinco.brewery.brew.BrewImpl;
 import dev.jsinco.brewery.breweries.InventoryAccessible;
 import dev.jsinco.brewery.bukkit.brew.BrewAdapter;
 import dev.jsinco.brewery.bukkit.breweries.BreweryRegistry;
+import dev.jsinco.brewery.bukkit.util.WrapperFactoryImpl;
 import dev.jsinco.brewery.database.sql.Database;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -86,7 +88,11 @@ public class InventoryEventListener implements Listener {
         Stream<ItemStack> itemsToCheck = relatedItems
                 .filter(Objects::nonNull)
                 .filter(item -> !item.getType().isAir());
-        if (itemsToCheck.anyMatch(item -> !inventoryAccessible.inventoryAllows(event.getWhoClicked().getUniqueId(), item))) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            event.setResult(Event.Result.DENY);
+            return;
+        }
+        if (itemsToCheck.anyMatch(item -> !inventoryAccessible.inventoryAllows(WrapperFactoryImpl.playerWrapper(player), item))) {
             event.setResult(Event.Result.DENY);
         }
     }
@@ -97,11 +103,15 @@ public class InventoryEventListener implements Listener {
         if (inventoryAccessible == null) {
             return;
         }
+        if (!(dragEvent.getWhoClicked() instanceof Player player)) {
+            dragEvent.setResult(Event.Result.DENY);
+            return;
+        }
         InventoryView inventoryView = dragEvent.getView();
         if (!dragEvent.getNewItems().entrySet().stream()
                 .filter(entry -> dragEvent.getInventory() == inventoryView.getInventory(entry.getKey()))
                 .map(Map.Entry::getValue)
-                .allMatch(itemStack -> inventoryAccessible.inventoryAllows(dragEvent.getWhoClicked().getUniqueId(), itemStack))) {
+                .allMatch(itemStack -> inventoryAccessible.inventoryAllows(WrapperFactoryImpl.playerWrapper(player), itemStack))) {
             dragEvent.setResult(Event.Result.DENY);
         }
     }

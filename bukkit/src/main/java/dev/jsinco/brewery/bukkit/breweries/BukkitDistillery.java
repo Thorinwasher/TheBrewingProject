@@ -8,10 +8,12 @@ import dev.jsinco.brewery.bukkit.brew.BrewAdapter;
 import dev.jsinco.brewery.bukkit.brew.BukkitDistilleryBrewDataType;
 import dev.jsinco.brewery.bukkit.structure.PlacedBreweryStructure;
 import dev.jsinco.brewery.bukkit.util.BukkitAdapter;
+import dev.jsinco.brewery.bukkit.util.WrapperFactoryImpl;
 import dev.jsinco.brewery.configuration.locale.TranslationsConfig;
 import dev.jsinco.brewery.database.PersistenceException;
 import dev.jsinco.brewery.structure.StructureMeta;
 import dev.jsinco.brewery.util.Pair;
+import dev.jsinco.brewery.util.Wrapper;
 import dev.jsinco.brewery.vector.BreweryLocation;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -81,16 +83,12 @@ public class BukkitDistillery implements Distillery<BukkitDistillery, ItemStack,
     }
 
     @Override
-    public boolean inventoryAllows(@NotNull UUID playerUuid, @NotNull ItemStack item) {
-        Player player = Bukkit.getPlayer(playerUuid);
-        if (player == null) {
-            return false;
-        }
-        if (!player.hasPermission("brewery.distillery.access")) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize(TranslationsConfig.DISTILLERY_ACCESS_DENIED));
-            return false;
-        }
-        return BrewAdapter.fromItem(item).isPresent();
+    public boolean inventoryAllows(@NotNull Wrapper<UUID, ?> playerWrapper, @NotNull ItemStack item) {
+        return WrapperFactoryImpl.playerWrapperType()
+                .value(playerWrapper)
+                .filter(player -> player.hasPermission("brewery.distillery.access"))
+                .filter(ignored -> BrewAdapter.fromItem(item).isPresent())
+                .isPresent();
     }
 
     @Override
@@ -109,10 +107,10 @@ public class BukkitDistillery implements Distillery<BukkitDistillery, ItemStack,
         Set<BreweryLocation> potLocations = new HashSet<>();
         Material taggedMaterial = Material.valueOf(structure.getStructure().getMeta(StructureMeta.TAGGED_MATERIAL).toUpperCase(Locale.ROOT));
         for (BreweryLocation location : structure.positions()) {
-            Block block = BukkitAdapter.toBlock(location);
-            if (taggedMaterial == block.getType()) {
-                potLocations.add(location);
-            }
+            BukkitAdapter.toBlock(location)
+                    .map(Block::getType)
+                    .filter(taggedMaterial::equals)
+                    .ifPresent(ignored -> potLocations.add(location));
         }
         for (BreweryLocation breweryLocation : potLocations) {
             if (potLocations.contains(breweryLocation.add(0, 1, 0)) || potLocations.contains(breweryLocation.add(0, -1, 0))) {
@@ -188,7 +186,8 @@ public class BukkitDistillery implements Distillery<BukkitDistillery, ItemStack,
 
     @Override
     public void destroy(BreweryLocation breweryLocation) {
-        Location location = BukkitAdapter.toLocation(breweryLocation).add(0.5, 0, 0.5);
+        Optional<Location> location = BukkitAdapter.toLocation(breweryLocation)
+                .map(location1 -> location1.add(0.5, 0, 0.5));
         for (DistilleryInventory distilleryInventory : List.of(distillate, mixture)) {
             List.copyOf(distilleryInventory.getInventory().getViewers()).forEach(HumanEntity::closeInventory);
             distilleryInventory.getInventory().clear();
@@ -196,7 +195,7 @@ public class BukkitDistillery implements Distillery<BukkitDistillery, ItemStack,
                 if (brew == null) {
                     continue;
                 }
-                location.getWorld().dropItem(location, BrewAdapter.toItem(brew, new Brew.State.Other()));
+                location.ifPresent(location1 -> location1.getWorld().dropItem(location1, BrewAdapter.toItem(brew, new Brew.State.Other())));
             }
         }
     }
@@ -244,7 +243,7 @@ public class BukkitDistillery implements Distillery<BukkitDistillery, ItemStack,
                 Brew previous = brews[position];
                 set(brew, position);
                 BreweryLocation unique = owner.getStructure().getUnique();
-                BukkitDistilleryBrewDataType.DistilleryContext context = new BukkitDistilleryBrewDataType.DistilleryContext(unique.x(), unique.y(), unique.z(), unique.worldUuid(), position, this == owner.getDistillate());
+                BukkitDistilleryBrewDataType.DistilleryContext context = new BukkitDistilleryBrewDataType.DistilleryContext(unique.x(), unique.y(), unique.z(), unique.world(), position, this == owner.getDistillate());
                 Pair<Brew, BukkitDistilleryBrewDataType.DistilleryContext> data = new Pair<>(brew, context);
                 if (previous == null) {
                     TheBrewingProject.getInstance().getDatabase().insertValue(BukkitDistilleryBrewDataType.INSTANCE, data);

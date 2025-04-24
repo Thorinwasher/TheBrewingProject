@@ -6,14 +6,13 @@ import dev.jsinco.brewery.bukkit.brew.BukkitDistilleryBrewDataType;
 import dev.jsinco.brewery.bukkit.structure.BreweryStructure;
 import dev.jsinco.brewery.bukkit.structure.PlacedBreweryStructure;
 import dev.jsinco.brewery.bukkit.util.BukkitAdapter;
-import dev.jsinco.brewery.database.*;
+import dev.jsinco.brewery.database.PersistenceException;
 import dev.jsinco.brewery.database.sql.SqlStoredData;
 import dev.jsinco.brewery.util.DecoderEncoder;
 import dev.jsinco.brewery.util.FileUtil;
 import dev.jsinco.brewery.util.Logging;
 import dev.jsinco.brewery.util.Pair;
 import dev.jsinco.brewery.vector.BreweryLocation;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.joml.Matrix3d;
@@ -25,9 +24,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public class BukkitDistilleryDataType implements SqlStoredData.Findable<BukkitDistillery, UUID>, SqlStoredData.Insertable<BukkitDistillery>, SqlStoredData.Removable<BukkitDistillery>, SqlStoredData.Updateable<BukkitDistillery> {
+public class BukkitDistilleryDataType implements SqlStoredData.Findable<BukkitDistillery, World>, SqlStoredData.Insertable<BukkitDistillery>, SqlStoredData.Removable<BukkitDistillery>, SqlStoredData.Updateable<BukkitDistillery> {
 
     public static final BukkitDistilleryDataType INSTANCE = new BukkitDistilleryDataType();
 
@@ -43,7 +41,7 @@ public class BukkitDistilleryDataType implements SqlStoredData.Findable<BukkitDi
             preparedStatement.setInt(4, unique.x());
             preparedStatement.setInt(5, unique.y());
             preparedStatement.setInt(6, unique.z());
-            preparedStatement.setBytes(7, DecoderEncoder.asBytes(origin.worldUuid()));
+            preparedStatement.setBytes(7, DecoderEncoder.asBytes(origin.world().getIdentifier()));
             preparedStatement.setString(8, DecoderEncoder.serializeTransformation(structure.getTransformation()));
             preparedStatement.setString(9, structure.getStructure().getName());
             preparedStatement.setLong(10, value.getStartTime());
@@ -60,7 +58,7 @@ public class BukkitDistilleryDataType implements SqlStoredData.Findable<BukkitDi
             preparedStatement.setInt(1, unique.x());
             preparedStatement.setInt(2, unique.y());
             preparedStatement.setInt(3, unique.z());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(unique.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(unique.world().getIdentifier()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException(e);
@@ -68,11 +66,10 @@ public class BukkitDistilleryDataType implements SqlStoredData.Findable<BukkitDi
     }
 
     @Override
-    public List<BukkitDistillery> find(UUID worldUuid, Connection connection) throws PersistenceException {
+    public List<BukkitDistillery> find(World world, Connection connection) throws PersistenceException {
         List<BukkitDistillery> output = new ArrayList<>();
-        World world = Bukkit.getWorld(worldUuid);
         try (PreparedStatement preparedStatement = connection.prepareStatement(FileUtil.readInternalResource("/database/generic/distilleries_select_all.sql"))) {
-            preparedStatement.setBytes(1, DecoderEncoder.asBytes(worldUuid));
+            preparedStatement.setBytes(1, DecoderEncoder.asBytes(world.getUID()));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int originX = resultSet.getInt("origin_x");
@@ -115,7 +112,7 @@ public class BukkitDistilleryDataType implements SqlStoredData.Findable<BukkitDi
             preparedStatement.setInt(2, unique.x());
             preparedStatement.setInt(3, unique.y());
             preparedStatement.setInt(4, unique.z());
-            preparedStatement.setBytes(5, DecoderEncoder.asBytes(unique.worldUuid()));
+            preparedStatement.setBytes(5, DecoderEncoder.asBytes(unique.world().getIdentifier()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException(e);

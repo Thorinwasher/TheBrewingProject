@@ -1,7 +1,7 @@
 package dev.jsinco.brewery.bukkit.util;
 
-import dev.jsinco.brewery.brew.Brew;
 import dev.jsinco.brewery.vector.BreweryLocation;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
@@ -10,7 +10,9 @@ import org.bukkit.block.data.Lightable;
 public class BlockUtil {
 
     public static boolean isChunkLoaded(BreweryLocation block) {
-        return BukkitAdapter.toLocation(block).isChunkLoaded();
+        return BukkitAdapter.toLocation(block)
+                .map(Location::isChunkLoaded)
+                .orElse(false);
     }
 
     public static boolean isLitCampfire(Block block) {

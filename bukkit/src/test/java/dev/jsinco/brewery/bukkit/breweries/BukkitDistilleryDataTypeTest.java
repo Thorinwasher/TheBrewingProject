@@ -46,7 +46,7 @@ class BukkitDistilleryDataTypeTest {
         Optional<Pair<PlacedBreweryStructure<BukkitDistillery>, Void>> optional = PlacedBreweryStructure.findValid(plugin.getStructureRegistry().getStructure("bamboo_distillery").get(), block.getLocation(), GenericBlockDataMatcher.INSTANCE, new Void[1]);
         BukkitDistillery distillery = new BukkitDistillery(optional.get().first(), 100);
         database.insertValue(BukkitDistilleryDataType.INSTANCE, distillery);
-        List<BukkitDistillery> distilleries = database.findNow(BukkitDistilleryDataType.INSTANCE, world.getUID());
+        List<BukkitDistillery> distilleries = database.findNow(BukkitDistilleryDataType.INSTANCE, world);
         assertEquals(1, distilleries.size());
         BukkitDistillery found = distilleries.get(0);
         assertEquals(distillery.getStructure().getStructure().getName(), found.getStructure().getStructure().getName());
@@ -54,12 +54,12 @@ class BukkitDistilleryDataTypeTest {
         assertEquals(100, found.getStartTime());
         BukkitDistillery newDistillery = new BukkitDistillery(optional.get().first(), 200);
         database.updateValue(BukkitDistilleryDataType.INSTANCE, newDistillery);
-        List<BukkitDistillery> fetchWithUpdatedValue = database.findNow(BukkitDistilleryDataType.INSTANCE, world.getUID());
+        List<BukkitDistillery> fetchWithUpdatedValue = database.findNow(BukkitDistilleryDataType.INSTANCE, world);
         assertEquals(1, distilleries.size());
         assertEquals(newDistillery.getStructure().getStructure().getName(), fetchWithUpdatedValue.getFirst().getStructure().getStructure().getName());
         assertEquals(newDistillery.getStructure().getTransformation(), fetchWithUpdatedValue.getFirst().getStructure().getTransformation());
         assertEquals(200, fetchWithUpdatedValue.get(0).getStartTime());
         database.remove(BukkitDistilleryDataType.INSTANCE, newDistillery);
-        assertTrue(database.findNow(BukkitDistilleryDataType.INSTANCE, world.getUID()).isEmpty());
+        assertTrue(database.findNow(BukkitDistilleryDataType.INSTANCE, world).isEmpty());
     }
 }

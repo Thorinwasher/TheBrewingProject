@@ -45,9 +45,9 @@ public class BlockEventListenerTest {
         Location potLocation = new Location(world, 0, 1, 0);
         playerSimulation.simulateBlockPlace(Material.DECORATED_POT, potLocation);
         assertTrue(plugin.getPlacedStructureRegistry().getStructure(BukkitAdapter.toBreweryLocation(potLocation)).isPresent());
-        assertEquals(1, plugin.getDatabase().findNow(BukkitDistilleryDataType.INSTANCE, world.getUID()).size());
+        assertEquals(1, plugin.getDatabase().findNow(BukkitDistilleryDataType.INSTANCE, world).size());
         playerSimulation.simulateBlockBreak(potLocation.getBlock());
         assertFalse(plugin.getPlacedStructureRegistry().getStructure(BukkitAdapter.toBreweryLocation(potLocation)).isPresent());
-        assertEquals(0, plugin.getDatabase().findNow(BukkitDistilleryDataType.INSTANCE, world.getUID()).size());
+        assertEquals(0, plugin.getDatabase().findNow(BukkitDistilleryDataType.INSTANCE, world).size());
     }
 }

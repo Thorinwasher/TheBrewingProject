@@ -8,6 +8,7 @@ import dev.jsinco.brewery.breweries.CauldronType;
 import dev.jsinco.brewery.bukkit.TheBrewingProject;
 import dev.jsinco.brewery.bukkit.brew.BukkitBarrelBrewDataType;
 import dev.jsinco.brewery.bukkit.ingredient.SimpleIngredient;
+import dev.jsinco.brewery.bukkit.util.WrapperFactoryImpl;
 import dev.jsinco.brewery.database.PersistenceException;
 import dev.jsinco.brewery.database.sql.Database;
 import dev.jsinco.brewery.util.DecoderEncoder;
@@ -53,7 +54,7 @@ class BukkitBarrelBrewDataTypeTest {
     @Test
     void checkPersistence() throws SQLException, PersistenceException {
         prepareBarrel();
-        BreweryLocation searchObject = new BreweryLocation(1, 2, 3, world.getUID());
+        BreweryLocation searchObject = new BreweryLocation(1, 2, 3, WrapperFactoryImpl.worldWrapper(world));
         BrewImpl brew1 = new BrewImpl(
                 List.of(
                         new BrewingStep.Cook(new PassedMoment(10), Map.of(new SimpleIngredient(Material.ACACIA_BUTTON), 3), CauldronType.WATER),

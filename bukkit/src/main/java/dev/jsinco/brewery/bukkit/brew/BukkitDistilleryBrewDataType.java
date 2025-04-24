@@ -4,11 +4,12 @@ import com.google.gson.JsonParser;
 import dev.jsinco.brewery.brew.Brew;
 import dev.jsinco.brewery.brew.BrewImpl;
 import dev.jsinco.brewery.bukkit.ingredient.BukkitIngredientManager;
-import dev.jsinco.brewery.database.*;
+import dev.jsinco.brewery.database.PersistenceException;
 import dev.jsinco.brewery.database.sql.SqlStoredData;
 import dev.jsinco.brewery.util.DecoderEncoder;
 import dev.jsinco.brewery.util.FileUtil;
 import dev.jsinco.brewery.util.Pair;
+import dev.jsinco.brewery.util.Wrapper;
 import dev.jsinco.brewery.vector.BreweryLocation;
 
 import java.sql.Connection;
@@ -32,13 +33,13 @@ public class BukkitDistilleryBrewDataType implements
             preparedStatement.setInt(1, searchObject.x());
             preparedStatement.setInt(2, searchObject.y());
             preparedStatement.setInt(3, searchObject.z());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(searchObject.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(searchObject.world().getIdentifier()));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int pos = resultSet.getInt("pos");
                 boolean isDistillate = resultSet.getBoolean("is_distillate");
                 Brew brew = BrewImpl.SERIALIZER.deserialize(JsonParser.parseString(resultSet.getString("brew")).getAsJsonArray(), BukkitIngredientManager.INSTANCE);
-                output.add(new Pair<>(brew, new DistilleryContext(searchObject.x(), searchObject.y(), searchObject.z(), searchObject.worldUuid(), pos, isDistillate)));
+                output.add(new Pair<>(brew, new DistilleryContext(searchObject.x(), searchObject.y(), searchObject.z(), searchObject.world(), pos, isDistillate)));
             }
         } catch (SQLException e) {
             throw new PersistenceException(e);
@@ -54,7 +55,7 @@ public class BukkitDistilleryBrewDataType implements
             preparedStatement.setInt(1, distilleryContext.uniqueX());
             preparedStatement.setInt(2, distilleryContext.uniqueY());
             preparedStatement.setInt(3, distilleryContext.uniqueZ());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(distilleryContext.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(distilleryContext.world().getIdentifier()));
             preparedStatement.setInt(5, distilleryContext.inventoryPos());
             preparedStatement.setBoolean(6, distilleryContext.distillate());
             preparedStatement.setString(7, BrewImpl.SERIALIZER.serialize(brew).toString());
@@ -71,7 +72,7 @@ public class BukkitDistilleryBrewDataType implements
             preparedStatement.setInt(1, distilleryContext.uniqueX());
             preparedStatement.setInt(2, distilleryContext.uniqueY());
             preparedStatement.setInt(3, distilleryContext.uniqueZ());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(distilleryContext.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(distilleryContext.world().getIdentifier()));
             preparedStatement.setInt(5, distilleryContext.inventoryPos());
             preparedStatement.setBoolean(6, distilleryContext.distillate());
             preparedStatement.execute();
@@ -89,7 +90,7 @@ public class BukkitDistilleryBrewDataType implements
             preparedStatement.setInt(2, distilleryContext.uniqueX());
             preparedStatement.setInt(3, distilleryContext.uniqueY());
             preparedStatement.setInt(4, distilleryContext.uniqueZ());
-            preparedStatement.setBytes(5, DecoderEncoder.asBytes(distilleryContext.worldUuid()));
+            preparedStatement.setBytes(5, DecoderEncoder.asBytes(distilleryContext.world().getIdentifier()));
             preparedStatement.setInt(6, distilleryContext.inventoryPos());
             preparedStatement.setBoolean(7, distilleryContext.distillate());
             preparedStatement.execute();
@@ -98,7 +99,7 @@ public class BukkitDistilleryBrewDataType implements
         }
     }
 
-    public record DistilleryContext(int uniqueX, int uniqueY, int uniqueZ, UUID worldUuid, int inventoryPos,
+    public record DistilleryContext(int uniqueX, int uniqueY, int uniqueZ, Wrapper<UUID, ?> world, int inventoryPos,
                                     boolean distillate) {
 
     }

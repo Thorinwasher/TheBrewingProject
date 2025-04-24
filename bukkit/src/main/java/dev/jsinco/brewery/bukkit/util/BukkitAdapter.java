@@ -7,31 +7,39 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class BukkitAdapter {
 
-    public static Location toLocation(BreweryLocation location) {
-        return new Location(Bukkit.getWorld(location.worldUuid()), location.x(), location.y(), location.z());
+    public static Optional<Location> toLocation(BreweryLocation location) {
+        return WrapperFactoryImpl.worldWrapperType().value(location.world())
+                .map(world -> new Location(world, location.x(), location.y(), location.z()));
     }
 
     public static BreweryLocation toBreweryLocation(Location location) {
-        return new BreweryLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getUID());
+        return new BreweryLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), WrapperFactoryImpl.worldWrapper(location.getWorld()));
     }
 
     public static BreweryLocation toBreweryLocation(Block block) {
-        return new BreweryLocation(block.getX(), block.getY(), block.getZ(), block.getWorld().getUID());
+        return new BreweryLocation(block.getX(), block.getY(), block.getZ(), WrapperFactoryImpl.worldWrapper(block.getWorld()));
     }
 
-    public static Block toBlock(BreweryLocation location) {
-        return Bukkit.getWorld(location.worldUuid()).getBlockAt(location.x(), location.y(), location.z());
+    public static Optional<Block> toBlock(BreweryLocation location) {
+        return WrapperFactoryImpl.worldWrapperType().value(location.world())
+                .map(world -> world.getBlockAt(location.x(), location.y(), location.z()));
     }
 
-    public static NamespacedKey toNamespacedKey(BreweryKey breweryKey) {
+    /**
+     * The format in brewery keys are different from namespacedkeys, can therefore return null
+     */
+    public static @Nullable NamespacedKey toNamespacedKey(BreweryKey breweryKey) {
         return NamespacedKey.fromString(breweryKey.toString());
     }
 
-    public static BreweryKey toBreweryKey(NamespacedKey namespacedKey) {
+    public static @NotNull BreweryKey toBreweryKey(NamespacedKey namespacedKey) {
         return new BreweryKey(namespacedKey.namespace(), namespacedKey.getKey());
     }
 

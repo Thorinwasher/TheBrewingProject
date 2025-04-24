@@ -38,6 +38,7 @@ public class BoltHook {
                 .map(MultiBlockStructure::positions)
                 .flatMap(List::stream)
                 .map(BukkitAdapter::toBlock)
+                .flatMap(Optional::stream)
                 .allMatch(position -> boltAPI.canAccess(position, player))
                 && boltAPI.canAccess(block, player);
     }

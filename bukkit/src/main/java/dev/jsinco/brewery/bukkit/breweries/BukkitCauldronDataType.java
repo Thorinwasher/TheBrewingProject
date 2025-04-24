@@ -4,12 +4,12 @@ import com.google.gson.JsonParser;
 import dev.jsinco.brewery.brew.Brew;
 import dev.jsinco.brewery.brew.BrewImpl;
 import dev.jsinco.brewery.bukkit.ingredient.BukkitIngredientManager;
+import dev.jsinco.brewery.bukkit.util.WrapperFactoryImpl;
 import dev.jsinco.brewery.database.PersistenceException;
 import dev.jsinco.brewery.database.sql.SqlStoredData;
 import dev.jsinco.brewery.util.DecoderEncoder;
 import dev.jsinco.brewery.util.FileUtil;
 import dev.jsinco.brewery.vector.BreweryLocation;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.sql.Connection;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCauldron, UUID>, SqlStoredData.Insertable<BukkitCauldron>, SqlStoredData.Updateable<BukkitCauldron>, SqlStoredData.Removable<BukkitCauldron> {
+public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCauldron, World>, SqlStoredData.Insertable<BukkitCauldron>, SqlStoredData.Updateable<BukkitCauldron>, SqlStoredData.Removable<BukkitCauldron> {
 
     public static final BukkitCauldronDataType INSTANCE = new BukkitCauldronDataType();
 
@@ -31,7 +31,7 @@ public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCaul
             preparedStatement.setInt(1, location.x());
             preparedStatement.setInt(2, location.y());
             preparedStatement.setInt(3, location.z());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(location.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(location.world().getIdentifier()));
             preparedStatement.setString(5, BrewImpl.SERIALIZER.serialize(value.getBrew()).toString());
             preparedStatement.execute();
         } catch (SQLException e) {
@@ -47,7 +47,7 @@ public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCaul
             preparedStatement.setInt(2, location.x());
             preparedStatement.setInt(3, location.y());
             preparedStatement.setInt(4, location.z());
-            preparedStatement.setBytes(5, DecoderEncoder.asBytes(location.worldUuid()));
+            preparedStatement.setBytes(5, DecoderEncoder.asBytes(location.world().getIdentifier()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException(e);
@@ -61,7 +61,7 @@ public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCaul
             preparedStatement.setInt(1, location.x());
             preparedStatement.setInt(2, location.y());
             preparedStatement.setInt(3, location.z());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(location.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(location.world().getIdentifier()));
             preparedStatement.execute();
         } catch (SQLException e) {
             throw new PersistenceException(e);
@@ -69,9 +69,9 @@ public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCaul
     }
 
     @Override
-    public List<BukkitCauldron> find(UUID worldUuid, Connection connection) throws PersistenceException {
+    public List<BukkitCauldron> find(World world, Connection connection) throws PersistenceException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(FileUtil.readInternalResource("/database/generic/cauldrons_select_all.sql"))) {
-            preparedStatement.setBytes(1, DecoderEncoder.asBytes(worldUuid));
+            preparedStatement.setBytes(1, DecoderEncoder.asBytes(world.getUID()));
             ResultSet resultSet = preparedStatement.executeQuery();
             List<BukkitCauldron> cauldrons = new ArrayList<>();
             while (resultSet.next()) {
@@ -79,7 +79,7 @@ public class BukkitCauldronDataType implements SqlStoredData.Findable<BukkitCaul
                 int y = resultSet.getInt("cauldron_y");
                 int z = resultSet.getInt("cauldron_z");
                 Brew brew = BrewImpl.SERIALIZER.deserialize(JsonParser.parseString(resultSet.getString("brew")).getAsJsonArray(), BukkitIngredientManager.INSTANCE);
-                cauldrons.add(new BukkitCauldron(brew, new BreweryLocation(x, y, z, worldUuid)));
+                cauldrons.add(new BukkitCauldron(brew, new BreweryLocation(x, y, z, WrapperFactoryImpl.worldWrapper(world))));
             }
             return cauldrons;
         } catch (SQLException e) {

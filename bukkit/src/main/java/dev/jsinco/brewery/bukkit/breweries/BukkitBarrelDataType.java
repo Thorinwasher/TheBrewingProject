@@ -13,6 +13,7 @@ import dev.jsinco.brewery.database.sql.SqlStoredData;
 import dev.jsinco.brewery.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.joml.Matrix3d;
 
 import java.sql.Connection;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BukkitBarrelDataType implements SqlStoredData.Findable<BukkitBarrel, UUID>, SqlStoredData.Removable<BukkitBarrel>, SqlStoredData.Insertable<BukkitBarrel> {
+public class BukkitBarrelDataType implements SqlStoredData.Findable<BukkitBarrel, World>, SqlStoredData.Removable<BukkitBarrel>, SqlStoredData.Insertable<BukkitBarrel> {
     public static final BukkitBarrelDataType INSTANCE = new BukkitBarrelDataType();
 
     @Override
@@ -74,14 +75,14 @@ public class BukkitBarrelDataType implements SqlStoredData.Findable<BukkitBarrel
     }
 
     @Override
-    public List<BukkitBarrel> find(UUID world, Connection connection) throws PersistenceException {
+    public List<BukkitBarrel> find(World world, Connection connection) throws PersistenceException {
         List<BukkitBarrel> output = new ArrayList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(FileUtil.readInternalResource("/database/generic/barrels_select_all.sql"))) {
-            preparedStatement.setBytes(1, DecoderEncoder.asBytes(world));
+            preparedStatement.setBytes(1, DecoderEncoder.asBytes(world.getUID()));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Location worldOrigin = new Location(Bukkit.getWorld(world), resultSet.getInt("origin_x"), resultSet.getInt("origin_y"), resultSet.getInt("origin_z"));
-                Location signLocation = new Location(Bukkit.getWorld(world), resultSet.getInt("unique_x"), resultSet.getInt("unique_y"), resultSet.getInt("unique_z"));
+                Location worldOrigin = new Location(world, resultSet.getInt("origin_x"), resultSet.getInt("origin_y"), resultSet.getInt("origin_z"));
+                Location signLocation = new Location(world, resultSet.getInt("unique_x"), resultSet.getInt("unique_y"), resultSet.getInt("unique_z"));
                 Matrix3d transform = DecoderEncoder.deserializeTransformation(resultSet.getString("transformation"));
                 String format = resultSet.getString("format");
                 BarrelType type = Registry.BARREL_TYPE.get(BreweryKey.parse(resultSet.getString("barrel_type")));

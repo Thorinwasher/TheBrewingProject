@@ -201,7 +201,8 @@ public class BukkitCauldron implements dev.jsinco.brewery.breweries.Cauldron {
     }
 
     private Block getBlock() {
-        return BukkitAdapter.toBlock(location);
+        return BukkitAdapter.toBlock(location)
+                .orElseThrow(() -> new IllegalStateException("Expected the world to be loaded!"));
     }
 
     public static void incrementLevel(Block block) {

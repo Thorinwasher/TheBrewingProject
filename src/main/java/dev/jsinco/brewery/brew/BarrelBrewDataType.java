@@ -72,7 +72,7 @@ public abstract class BarrelBrewDataType<I> implements
             preparedStatement.setInt(1, signLocation.x());
             preparedStatement.setInt(2, signLocation.y());
             preparedStatement.setInt(3, signLocation.z());
-            preparedStatement.setBytes(4, DecoderEncoder.asBytes(signLocation.worldUuid()));
+            preparedStatement.setBytes(4, DecoderEncoder.asBytes(signLocation.world().getIdentifier()));
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Pair<Brew, Integer>> output = new ArrayList<>();
             while (resultSet.next()) {

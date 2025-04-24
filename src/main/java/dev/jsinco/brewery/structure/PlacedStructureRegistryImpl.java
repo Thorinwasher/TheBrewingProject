@@ -12,20 +12,20 @@ public class PlacedStructureRegistryImpl implements PlacedStructureRegistry {
 
     public void registerStructure(MultiBlockStructure<?> placedBreweryStructure) {
         for (BreweryLocation location : placedBreweryStructure.positions()) {
-            UUID worldUuid = location.worldUuid();
+            UUID worldUuid = location.world().getIdentifier();
             structures.computeIfAbsent(worldUuid, ignored -> new HashMap<>()).put(location.toVector(), placedBreweryStructure);
         }
     }
 
     public void unregisterStructure(MultiBlockStructure<?> structure) {
         for (BreweryLocation location : structure.positions()) {
-            UUID worldUuid = location.worldUuid();
+            UUID worldUuid = location.world().getIdentifier();
             structures.computeIfAbsent(worldUuid, ignored -> new HashMap<>()).remove(location.toVector());
         }
     }
 
     public Optional<MultiBlockStructure<?>> getStructure(BreweryLocation location) {
-        UUID worldUuid = location.worldUuid();
+        UUID worldUuid = location.world().getIdentifier();
         Map<BreweryVector, MultiBlockStructure<?>> placedBreweryStructureMap = structures.getOrDefault(worldUuid, new HashMap<>());
         return Optional.ofNullable(placedBreweryStructureMap.get(location.toVector()));
     }
@@ -39,7 +39,7 @@ public class PlacedStructureRegistryImpl implements PlacedStructureRegistry {
     }
 
     public Optional<StructureHolder<?>> getHolder(BreweryLocation location) {
-        UUID worldUuid = location.worldUuid();
+        UUID worldUuid = location.world().getIdentifier();
         Map<BreweryVector, MultiBlockStructure<? extends StructureHolder<?>>> placedBreweryStructureMap = structures.getOrDefault(worldUuid, new HashMap<>());
         return Optional.ofNullable(placedBreweryStructureMap.get(location.toVector()))
                 .map(MultiBlockStructure::getHolder);

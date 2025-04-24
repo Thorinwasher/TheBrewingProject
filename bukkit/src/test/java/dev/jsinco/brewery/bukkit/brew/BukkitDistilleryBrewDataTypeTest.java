@@ -72,8 +72,8 @@ class BukkitDistilleryBrewDataTypeTest {
                         new BrewingStep.Distill(3)
                 )
         );
-        BukkitDistilleryBrewDataType.DistilleryContext distilleryContext1 = new BukkitDistilleryBrewDataType.DistilleryContext(searchObject.x(), searchObject.y(), searchObject.z(), searchObject.worldUuid(), 0, false);
-        BukkitDistilleryBrewDataType.DistilleryContext distilleryContext2 = new BukkitDistilleryBrewDataType.DistilleryContext(searchObject.x(), searchObject.y(), searchObject.z(), searchObject.worldUuid(), 0, true);
+        BukkitDistilleryBrewDataType.DistilleryContext distilleryContext1 = new BukkitDistilleryBrewDataType.DistilleryContext(searchObject.x(), searchObject.y(), searchObject.z(), searchObject.world(), 0, false);
+        BukkitDistilleryBrewDataType.DistilleryContext distilleryContext2 = new BukkitDistilleryBrewDataType.DistilleryContext(searchObject.x(), searchObject.y(), searchObject.z(), searchObject.world(), 0, true);
         Pair<Brew, BukkitDistilleryBrewDataType.DistilleryContext> data1 = new Pair<>(brew1, distilleryContext1);
         Pair<Brew, BukkitDistilleryBrewDataType.DistilleryContext> data2 = new Pair<>(brew2, distilleryContext2);
         database.insertValue(BukkitDistilleryBrewDataType.INSTANCE, data1);

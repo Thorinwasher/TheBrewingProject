@@ -9,12 +9,14 @@ import dev.jsinco.brewery.bukkit.brew.BrewAdapter;
 import dev.jsinco.brewery.bukkit.brew.BukkitBarrelBrewDataType;
 import dev.jsinco.brewery.bukkit.structure.PlacedBreweryStructure;
 import dev.jsinco.brewery.bukkit.util.BukkitAdapter;
+import dev.jsinco.brewery.bukkit.util.WrapperFactoryImpl;
 import dev.jsinco.brewery.configuration.locale.TranslationsConfig;
 import dev.jsinco.brewery.database.PersistenceException;
 import dev.jsinco.brewery.database.sql.Database;
-import dev.jsinco.brewery.util.Pair;
 import dev.jsinco.brewery.moment.Interval;
 import dev.jsinco.brewery.moment.Moment;
+import dev.jsinco.brewery.util.Pair;
+import dev.jsinco.brewery.util.Wrapper;
 import dev.jsinco.brewery.vector.BreweryLocation;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -69,16 +71,11 @@ public class BukkitBarrel implements Barrel<BukkitBarrel, ItemStack, Inventory>,
     }
 
     @Override
-    public boolean inventoryAllows(@NotNull UUID playerUuid, @NotNull ItemStack item) {
-        Player player = Bukkit.getPlayer(playerUuid);
-        if (player == null) {
-            return false;
-        }
-        if (!player.hasPermission("brewery.barrel.access")) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize(TranslationsConfig.BARREL_ACCESS_DENIED));
-            return false;
-        }
-        return BrewAdapter.fromItem(item).isPresent();
+    public boolean inventoryAllows(@NotNull Wrapper<UUID, ?> playerWrapper, @NotNull ItemStack item) {
+        return WrapperFactoryImpl.playerWrapperType().value(playerWrapper)
+                .filter(player -> player.hasPermission("brewery.barrel.access"))
+                .filter(ignored -> BrewAdapter.fromItem(item).isPresent())
+                .isPresent();
     }
 
     @Override
@@ -105,14 +102,15 @@ public class BukkitBarrel implements Barrel<BukkitBarrel, ItemStack, Inventory>,
 
     @Override
     public void destroy(BreweryLocation breweryLocation) {
-        Location location = BukkitAdapter.toLocation(breweryLocation).add(0.5, 0, 0.5);
+        Optional<Location> location = BukkitAdapter.toLocation(breweryLocation)
+                .map(location1 -> location1.add(0.5, 0, 0.5));
         List.copyOf(inventory.getViewers()).forEach(HumanEntity::closeInventory);
         this.inventory.clear();
         for (Brew brew : brews) {
             if (brew == null) {
                 continue;
             }
-            location.getWorld().dropItem(location, BrewAdapter.toItem(brew, new Brew.State.Other()));
+            location.ifPresent(location1 -> location1.getWorld().dropItem(location1, BrewAdapter.toItem(brew, new Brew.State.Other())));
         }
     }
 

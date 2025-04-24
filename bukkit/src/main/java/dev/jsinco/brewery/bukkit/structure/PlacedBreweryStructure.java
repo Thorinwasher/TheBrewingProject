@@ -1,6 +1,7 @@
 package dev.jsinco.brewery.bukkit.structure;
 
 import dev.jsinco.brewery.breweries.StructureHolder;
+import dev.jsinco.brewery.bukkit.util.BukkitAdapter;
 import dev.jsinco.brewery.structure.MultiBlockStructure;
 import dev.jsinco.brewery.util.Pair;
 import dev.jsinco.brewery.vector.BreweryLocation;
@@ -50,7 +51,7 @@ public class PlacedBreweryStructure<H extends StructureHolder<H>> implements Mul
         return structure.getExpectedBlocks(transformation, worldOrigin)
                 .keySet()
                 .stream()
-                .map(location -> new BreweryLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getUID()))
+                .map(BukkitAdapter::toBreweryLocation)
                 .toList();
     }
 

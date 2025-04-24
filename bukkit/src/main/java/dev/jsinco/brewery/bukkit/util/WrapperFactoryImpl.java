@@ -5,6 +5,7 @@ import dev.jsinco.brewery.util.Wrapper;
 import dev.jsinco.brewery.util.WrapperFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
