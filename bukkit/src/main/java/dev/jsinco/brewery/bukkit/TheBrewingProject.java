@@ -27,6 +27,7 @@ import dev.jsinco.brewery.bukkit.structure.BarrelBlockDataMatcher;
 import dev.jsinco.brewery.bukkit.structure.StructureReader;
 import dev.jsinco.brewery.bukkit.structure.StructureRegistry;
 import dev.jsinco.brewery.bukkit.util.BreweryTimeDataType;
+import dev.jsinco.brewery.bukkit.util.WrapperFactoryImpl;
 import dev.jsinco.brewery.configuration.Config;
 import dev.jsinco.brewery.configuration.locale.TranslationsConfig;
 import dev.jsinco.brewery.database.PersistenceException;
@@ -42,6 +43,7 @@ import dev.jsinco.brewery.structure.StructureMeta;
 import dev.jsinco.brewery.structure.StructureType;
 import dev.jsinco.brewery.util.BreweryKey;
 import dev.jsinco.brewery.util.Util;
+import dev.jsinco.brewery.util.WrapperFactory;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -82,7 +84,9 @@ public class TheBrewingProject extends JavaPlugin implements TheBrewingProjectAp
     @Getter
     private long time;
     @Getter
-    private BrewManager<ItemStack> brewManager = new BukkitBrewManager();
+    private final BrewManager<ItemStack> brewManager = new BukkitBrewManager();
+    @Getter
+    private final WrapperFactory wrapperFactory = new WrapperFactoryImpl();
 
     @Override
     public void onLoad() {

@@ -1,5 +1,6 @@
 package dev.jsinco.brewery.breweries;
 
+import dev.jsinco.brewery.util.Wrapper;
 import dev.jsinco.brewery.vector.BreweryLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +11,7 @@ public interface InventoryAccessible<IS, I> {
 
     boolean open(@NotNull BreweryLocation breweryLocation, @NotNull UUID playerUuid);
 
-    boolean inventoryAllows(@NotNull UUID playerUuid, @NotNull IS item);
+    boolean inventoryAllows(@NotNull Wrapper<UUID, ?> player, @NotNull IS item);
 
     Set<I> getInventories();
 }

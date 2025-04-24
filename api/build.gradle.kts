@@ -15,6 +15,10 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.0")
     compileOnly("com.google.code.gson:gson:2.12.1")
     compileOnly("com.google.guava:guava:33.4.0-jre")
+
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
 tasks.test {

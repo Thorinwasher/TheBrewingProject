@@ -11,7 +11,7 @@ import dev.jsinco.brewery.bukkit.effect.event.DrunkEventExecutor;
 import dev.jsinco.brewery.bukkit.ingredient.BukkitIngredientManager;
 import dev.jsinco.brewery.bukkit.ingredient.SimpleIngredient;
 import dev.jsinco.brewery.bukkit.integration.structure.StructureAccessHook;
-import dev.jsinco.brewery.bukkit.recipe.RecipeEffects;
+import dev.jsinco.brewery.bukkit.recipe.RecipeEffectsImpl;
 import dev.jsinco.brewery.bukkit.util.BukkitAdapter;
 import dev.jsinco.brewery.bukkit.util.MessageUtil;
 import dev.jsinco.brewery.configuration.Config;
@@ -40,7 +40,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -233,7 +232,7 @@ public class PlayerEventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
-        RecipeEffects.fromItem(event.getItem())
+        RecipeEffectsImpl.fromItem(event.getItem())
                 .ifPresent(effect -> effect.applyTo(event.getPlayer(), drunksManager));
     }
 

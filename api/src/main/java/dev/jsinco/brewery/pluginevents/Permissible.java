@@ -1,31 +1,30 @@
 package dev.jsinco.brewery.pluginevents;
 
-public class Permissible extends Cancellable{
+import dev.jsinco.brewery.util.Wrapper;
+import lombok.Getter;
+import lombok.Setter;
 
-    private final String permissionsNode;
+import java.util.UUID;
+
+public class Permissible extends Cancellable {
+
+    @Getter
+    private final String permissionNode;
+    @Setter
+    @Getter
+    private Wrapper<UUID, ?> player;
+    @Setter
     private String denyMessage;
+    @Setter
+    @Getter
     private boolean permission;
 
-    protected Permissible(String permissionNode, boolean permission, boolean cancelled, String denyMessage) {
+    protected Permissible(String permissionNode, boolean permission, boolean cancelled, String denyMessage, Wrapper<UUID, ?> player) {
         super(cancelled);
-        this.permissionsNode = permissionNode;
+        this.permissionNode = permissionNode;
         this.permission = permission;
         this.denyMessage = denyMessage;
+        this.player = player;
     }
 
-    public String getPermissionNode() {
-        return this.permissionsNode;
-    }
-
-    public boolean hasPermission() {
-        return this.permission;
-    }
-
-    public void setPermission(boolean permission) {
-        this.permission = permission;
-    }
-
-    public void setDenyMessage(String denyMessage) {
-        this.denyMessage = denyMessage;
-    }
 }

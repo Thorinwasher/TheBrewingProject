@@ -1,16 +1,14 @@
 package dev.jsinco.brewery.pluginevents;
 
-import dev.jsinco.brewery.structure.MultiBlockStructure;
+import dev.jsinco.brewery.structure.Structure;
+import lombok.Getter;
 
 public class StructureDestroyEvent extends Cancellable {
-    private final MultiBlockStructure<?> structure;
+    @Getter
+    private final Structure structure;
 
-    protected StructureDestroyEvent(boolean cancelled, MultiBlockStructure<?> structure) {
+    protected StructureDestroyEvent(boolean cancelled, Structure structure) {
         super(cancelled);
         this.structure = structure;
-    }
-
-    public MultiBlockStructure<?> getStructure() {
-        return this.structure;
     }
 }

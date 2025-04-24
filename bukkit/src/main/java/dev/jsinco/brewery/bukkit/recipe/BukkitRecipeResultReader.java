@@ -31,7 +31,7 @@ public class BukkitRecipeResultReader implements RecipeResultReader<ItemStack> {
                 .build();
     }
 
-    private static QualityData<RecipeEffects> getRecipeEffects(ConfigurationSection configurationSection) {
+    private static QualityData<RecipeEffectsImpl> getRecipeEffects(ConfigurationSection configurationSection) {
         QualityData<String> actionBar = QualityData.readQualityFactoredString(configurationSection.getString("messages.action-bar", null));
         QualityData<String> title = QualityData.readQualityFactoredString(configurationSection.getString("messages.title", null));
         QualityData<String> message = QualityData.readQualityFactoredString(configurationSection.getString("messages.message", null));
@@ -49,7 +49,7 @@ public class BukkitRecipeResultReader implements RecipeResultReader<ItemStack> {
                 );
         QualityData<Integer> alcohol = QualityData.readQualityFactoredString(configurationSection.getString("alcohol", "0%"))
                 .map(RecipeReader::parseAlcoholString);
-        return QualityData.fromValueMapper(quality -> new RecipeEffects.Builder()
+        return QualityData.fromValueMapper(quality -> new RecipeEffectsImpl.Builder()
                 .actionBar(actionBar.get(quality))
                 .title(title.get(quality))
                 .message(message.get(quality))

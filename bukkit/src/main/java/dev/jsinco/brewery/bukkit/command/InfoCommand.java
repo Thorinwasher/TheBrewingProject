@@ -1,10 +1,9 @@
 package dev.jsinco.brewery.bukkit.command;
 
 import dev.jsinco.brewery.brew.Brew;
-import dev.jsinco.brewery.brew.BrewImpl;
 import dev.jsinco.brewery.bukkit.TheBrewingProject;
 import dev.jsinco.brewery.bukkit.brew.BrewAdapter;
-import dev.jsinco.brewery.bukkit.recipe.RecipeEffects;
+import dev.jsinco.brewery.bukkit.recipe.RecipeEffectsImpl;
 import dev.jsinco.brewery.bukkit.util.MessageUtil;
 import dev.jsinco.brewery.configuration.locale.TranslationsConfig;
 import dev.jsinco.brewery.recipes.BrewScoreImpl;
@@ -36,7 +35,7 @@ public class InfoCommand {
                                 )
                         )
                 ));
-        Optional<RecipeEffects> recipeEffectsOptional = RecipeEffects.fromItem(item);
+        Optional<RecipeEffectsImpl> recipeEffectsOptional = RecipeEffectsImpl.fromItem(item);
         recipeEffectsOptional.ifPresent(effects -> {
             sender.sendMessage(MiniMessage.miniMessage().deserialize(TranslationsConfig.COMMAND_INFO_EFFECT_MESSAGE, MessageUtil.recipeEffectResolver(effects)));
         });

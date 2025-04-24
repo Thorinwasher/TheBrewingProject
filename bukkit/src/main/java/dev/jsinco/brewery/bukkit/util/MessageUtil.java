@@ -2,10 +2,11 @@ package dev.jsinco.brewery.bukkit.util;
 
 import dev.jsinco.brewery.brew.*;
 import dev.jsinco.brewery.bukkit.TheBrewingProject;
-import dev.jsinco.brewery.bukkit.recipe.RecipeEffects;
+import dev.jsinco.brewery.bukkit.recipe.RecipeEffectsImpl;
 import dev.jsinco.brewery.configuration.locale.TranslationsConfig;
+import dev.jsinco.brewery.effect.DrunkState;
 import dev.jsinco.brewery.effect.DrunkStateImpl;
-import dev.jsinco.brewery.effect.DrunksManagerImpl;
+import dev.jsinco.brewery.effect.DrunksManager;
 import dev.jsinco.brewery.event.NamedDrunkEvent;
 import dev.jsinco.brewery.ingredient.Ingredient;
 import dev.jsinco.brewery.recipes.BrewScoreImpl;
@@ -35,8 +36,8 @@ public class MessageUtil {
 
     private static final char SKULL = '\u2620';
 
-    public static Component compilePlayerMessage(String message, Player player, DrunksManagerImpl<?> drunksManager, int alcohol) {
-        DrunkStateImpl drunkState = drunksManager.getDrunkState(player.getUniqueId());
+    public static Component compilePlayerMessage(String message, Player player, DrunksManager drunksManager, int alcohol) {
+        DrunkState drunkState = drunksManager.getDrunkState(player.getUniqueId());
         return MiniMessage.miniMessage().deserialize(
                 message,
                 Placeholder.parsed("alcohol", String.valueOf(alcohol)),
@@ -100,7 +101,7 @@ public class MessageUtil {
         );
     }
 
-    public static TagResolver recipeEffectResolver(RecipeEffects effects) {
+    public static TagResolver recipeEffectResolver(RecipeEffectsImpl effects) {
         return TagResolver.resolver(
                 Placeholder.component("potion_effects", effects.getEffects().stream()
                         .map(effect ->
@@ -148,7 +149,7 @@ public class MessageUtil {
         return compileBrewInfo(brew, score, detailed);
     }
 
-    public static @NotNull TagResolver getDrunkStateTagResolver(@Nullable DrunkStateImpl drunkState) {
+    public static @NotNull TagResolver getDrunkStateTagResolver(@Nullable DrunkState drunkState) {
         return TagResolver.resolver(
                 Placeholder.component("alcohol_level", compileAlcoholLevel(drunkState == null ? 0 : drunkState.alcohol())),
                 Placeholder.component("toxins_level", compileToxinsLevel(drunkState == null ? 0 : drunkState.toxins()))

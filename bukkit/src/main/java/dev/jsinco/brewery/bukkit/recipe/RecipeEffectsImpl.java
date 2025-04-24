@@ -8,11 +8,12 @@ import dev.jsinco.brewery.bukkit.util.ListPersistentDataType;
 import dev.jsinco.brewery.bukkit.util.MessageUtil;
 import dev.jsinco.brewery.configuration.locale.TranslationsConfig;
 import dev.jsinco.brewery.effect.DrunkStateImpl;
+import dev.jsinco.brewery.effect.DrunksManager;
 import dev.jsinco.brewery.effect.DrunksManagerImpl;
 import dev.jsinco.brewery.event.CustomEventRegistry;
 import dev.jsinco.brewery.event.DrunkEvent;
 import dev.jsinco.brewery.event.EventStep;
-import dev.jsinco.brewery.recipes.BrewScoreImpl;
+import dev.jsinco.brewery.recipe.RecipeEffects;
 import dev.jsinco.brewery.util.BreweryKey;
 import dev.jsinco.brewery.util.Registry;
 import lombok.Getter;
@@ -36,7 +37,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
-public class RecipeEffects {
+public class RecipeEffectsImpl implements RecipeEffects<Player> {
 
     public static final NamespacedKey COMMANDS = BukkitAdapter.toNamespacedKey(BreweryKey.parse("commands"));
     public static final NamespacedKey MESSAGE = BukkitAdapter.toNamespacedKey(BreweryKey.parse("message"));
@@ -47,7 +48,7 @@ public class RecipeEffects {
     public static final NamespacedKey EVENTS = BukkitAdapter.toNamespacedKey(BreweryKey.parse("events"));
     private static final List<NamespacedKey> PDC_TYPES = List.of(COMMANDS, MESSAGE, ACTION_BAR, TITLE, ALCOHOL, TOXINS, EVENTS);
 
-    public static final RecipeEffects GENERIC = new Builder()
+    public static final RecipeEffectsImpl GENERIC = new Builder()
             .effects(List.of())
             .build();
 
@@ -59,7 +60,7 @@ public class RecipeEffects {
     private final @NotNull List<@NotNull BreweryKey> events;
     private final int toxins;
 
-    private RecipeEffects(@NotNull List<RecipeEffect> effects, @Nullable String title, @Nullable String message, @Nullable String actionBar, int alcohol, @NotNull List<@NotNull BreweryKey> events, int toxins) {
+    private RecipeEffectsImpl(@NotNull List<RecipeEffect> effects, @Nullable String title, @Nullable String message, @Nullable String actionBar, int alcohol, @NotNull List<@NotNull BreweryKey> events, int toxins) {
         this.effects = effects;
         this.title = title;
         this.message = message;
@@ -106,8 +107,8 @@ public class RecipeEffects {
         container.set(EVENTS, ListPersistentDataType.STRING_LIST, events.stream().map(BreweryKey::toString).toList());
     }
 
-    public static Optional<RecipeEffects> fromItem(@NotNull ItemStack item) {
-        RecipeEffects.Builder builder = new RecipeEffects.Builder();
+    public static Optional<RecipeEffectsImpl> fromItem(@NotNull ItemStack item) {
+        RecipeEffectsImpl.Builder builder = new RecipeEffectsImpl.Builder();
         ItemMeta meta = item.getItemMeta();
         if (meta == null) {
             return Optional.empty();
@@ -135,7 +136,7 @@ public class RecipeEffects {
         return Optional.of(builder.build());
     }
 
-    public void applyTo(Player player, DrunksManagerImpl<?> drunksManager) {
+    public void applyTo(Player player, DrunksManager drunksManager) {
         drunksManager.consume(player.getUniqueId(), alcohol, toxins);
         if (title != null) {
             player.showTitle(Title.title(MessageUtil.compilePlayerMessage(title, player, drunksManager, this.alcohol), Component.empty()));
@@ -210,10 +211,10 @@ public class RecipeEffects {
             return this;
         }
 
-        public RecipeEffects build() {
+        public RecipeEffectsImpl build() {
             Preconditions.checkNotNull(effects);
             Preconditions.checkNotNull(events);
-            return new RecipeEffects(effects, title, message, actionBar, alcohol, events, toxins);
+            return new RecipeEffectsImpl(effects, title, message, actionBar, alcohol, events, toxins);
         }
 
     }

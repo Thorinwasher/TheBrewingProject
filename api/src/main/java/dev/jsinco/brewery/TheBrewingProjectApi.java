@@ -4,6 +4,7 @@ import dev.jsinco.brewery.brew.BrewManager;
 import dev.jsinco.brewery.effect.DrunksManager;
 import dev.jsinco.brewery.recipe.RecipeRegistry;
 import dev.jsinco.brewery.structure.PlacedStructureRegistry;
+import dev.jsinco.brewery.util.WrapperFactory;
 
 public interface TheBrewingProjectApi {
 
@@ -15,4 +16,6 @@ public interface TheBrewingProjectApi {
     <I> RecipeRegistry<I> getRecipeRegistry();
 
     PlacedStructureRegistry getPlacedStructureRegistry();
+
+    WrapperFactory getWrapperFactory();
 }

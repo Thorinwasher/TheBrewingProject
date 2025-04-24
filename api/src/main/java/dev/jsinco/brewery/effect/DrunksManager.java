@@ -1,6 +1,7 @@
 package dev.jsinco.brewery.effect;
 
 import dev.jsinco.brewery.util.BreweryKey;
+import dev.jsinco.brewery.util.Wrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 public interface DrunksManager {
 
-    @Nullable DrunkState consume(UUID playerUuid, int alcohol, int toxins);
+    @Nullable DrunkState consume(Wrapper<UUID, ?> playerUuid, int alcohol, int toxins);
 
     @Nullable DrunkState getDrunkState(UUID playerUuid);
 

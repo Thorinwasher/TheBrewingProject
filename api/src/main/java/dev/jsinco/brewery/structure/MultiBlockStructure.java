@@ -5,7 +5,7 @@ import dev.jsinco.brewery.vector.BreweryLocation;
 
 import java.util.List;
 
-public interface MultiBlockStructure<H extends StructureHolder<H>> {
+public interface MultiBlockStructure<H extends StructureHolder<H>> extends Structure{
 
     List<BreweryLocation> positions();
 

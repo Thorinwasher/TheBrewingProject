@@ -22,7 +22,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -41,7 +40,7 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
     public static final BukkitRecipeResult GENERIC = new Builder()
             .names(QualityData.equalValue("Unknown brew"))
             .lore(QualityData.equalValue(List.of()))
-            .recipeEffects(QualityData.equalValue(RecipeEffects.GENERIC))
+            .recipeEffects(QualityData.equalValue(RecipeEffectsImpl.GENERIC))
             .build();
     private final boolean glint;
     private final int customModelData;
@@ -53,12 +52,12 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
     private final QualityData<List<String>> lore;
 
     @Getter
-    private final QualityData<RecipeEffects> recipeEffects;
+    private final QualityData<RecipeEffectsImpl> recipeEffects;
     @Getter
     private final Color color;
     private final boolean appendBrewInfoLore;
 
-    private BukkitRecipeResult(boolean glint, int customModelData, QualityData<RecipeEffects> recipeEffects, QualityData<String> names, QualityData<List<String>> lore, Color color, boolean appendBrewInfoLore, @Nullable BreweryKey customId) {
+    private BukkitRecipeResult(boolean glint, int customModelData, QualityData<RecipeEffectsImpl> recipeEffects, QualityData<String> names, QualityData<List<String>> lore, Color color, boolean appendBrewInfoLore, @Nullable BreweryKey customId) {
         this.glint = glint;
         this.customModelData = customModelData;
         this.recipeEffects = recipeEffects;
@@ -82,7 +81,7 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
             };
             if (itemStack != null) {
                 ItemMeta meta = itemStack.getItemMeta();
-                recipeEffects.getOrDefault(quality, RecipeEffects.GENERIC).applyTo(meta, score);
+                recipeEffects.getOrDefault(quality, RecipeEffectsImpl.GENERIC).applyTo(meta, score);
                 itemStack.setItemMeta(meta);
                 return itemStack;
             } else {
@@ -109,7 +108,7 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
         if (customModelData > 0) {
             meta.setCustomModelData(customModelData);
         }
-        recipeEffects.getOrDefault(quality, RecipeEffects.GENERIC).applyTo(meta, score);
+        recipeEffects.getOrDefault(quality, RecipeEffectsImpl.GENERIC).applyTo(meta, score);
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -124,7 +123,7 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
             case Brew.State.Brewing brewing -> {
                 streamBuilder.add(compileMessage(score, brew, TranslationsConfig.BREW_TOOLTIP_QUALITY_BREWING, false));
                 MessageUtil.compileBrewInfo(brew, score, false).forEach(streamBuilder::add);
-                int alcohol = recipeEffects.map(RecipeEffects::getAlcohol).getOrDefault(quality, 0);
+                int alcohol = recipeEffects.map(RecipeEffectsImpl::getAlcohol).getOrDefault(quality, 0);
                 if (alcohol > 0) {
                     streamBuilder.add(MiniMessage.miniMessage().deserialize(TranslationsConfig.DETAILED_ALCOHOLIC, Formatter.number("alcohol", alcohol)));
                 }
@@ -179,7 +178,7 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
         private int customModelData;
         private QualityData<String> names;
         private QualityData<List<String>> lore;
-        private QualityData<RecipeEffects> recipeEffects;
+        private QualityData<RecipeEffectsImpl> recipeEffects;
         private Color color = Color.BLUE;
         private boolean appendBrewInfoLore = true;
         private BreweryKey customId;
@@ -204,7 +203,7 @@ public class BukkitRecipeResult implements RecipeResult<ItemStack> {
             return this;
         }
 
-        public Builder recipeEffects(@NotNull QualityData<RecipeEffects> recipeEffects) {
+        public Builder recipeEffects(@NotNull QualityData<RecipeEffectsImpl> recipeEffects) {
             this.recipeEffects = Objects.requireNonNull(recipeEffects);
             return this;
         }
